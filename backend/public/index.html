@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gestión de Usuarios</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #93c5fd, #e0f2fe);
+      color: #1e3a8a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      width: 100%;
+      background: rgba(30, 58, 138, 0.95);
+      padding: 25px 0;
+      color: white;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    header h1 {
+      font-size: 2rem;
+    }
+
+    main {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      padding: 30px;
+      margin-top: 40px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 850px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+
+    input, button {
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 15px;
+    }
+
+    input {
+      border: 1px solid #cbd5e1;
+      outline-color: #3b82f6;
+    }
+
+    button {
+      background-color: #2563eb;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+      border: none;
+    }
+
+    button:hover {
+      background-color: #1d4ed8;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      padding: 14px;
+      border-bottom: 1px solid #e2e8f0;
+      text-align: left;
+    }
+
+    th {
+      background-color: #3b82f6;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    tr:hover {
+      background-color: #e0f2fe;
+    }
+
+    .delete-btn {
+      background: #ef4444;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+
+    .delete-btn:hover {
+      background: #dc2626;
+    }
+
+    @media (max-width: 600px) {
+      th, td {
+        font-size: 13px;
+      }
+
+      main {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>✨ Sistema de Usuarios</h1>
+    <p>Gestiona y consulta usuarios</p>
+  </header>
+
+  <main>
+    <form id="usuarioForm">
+      <input type="text" id="nombre" placeholder="Nombre completo" required />
+      <input type="email" id="email" placeholder="Correo electrónico" required />
+      <button type="submit">➕ Agregar usuario</button>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="usuariosTabla"></tbody>
+    </table>
+  </main>
+
+  <script>
+    const apiURL = "http://localhost:3000/usuarios";
+
+    async function obtenerUsuarios() {
+      try {
+        const res = await fetch(apiURL);
+        const datos = await res.json();
+        const tabla = document.getElementById("usuariosTabla");
+        tabla.innerHTML = "";
+
+        datos.forEach(usuario => {
+          const fila = `
+            <tr>
+              <td>${usuario.id}</td>
+              <td>${usuario.nombre}</td>
+              <td>${usuario.email}</td>
+              <td><button class="delete-btn" onclick="eliminarUsuario(${usuario.id})">🗑️</button></td>
+            </tr>`;
+          tabla.innerHTML += fila;
+        });
+      } catch (error) {
+        alert("❌ Error al obtener usuarios");
+        console.error(error);
+      }
+    }
+
+    document.getElementById("usuarioForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const nombre = document.getElementById("nombre").value;
+      const email = document.getElementById("email").value;
+
+      try {
+        const res = await fetch(apiURL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ nombre, email })
+        });
+
+        if (res.ok) {
+          document.getElementById("usuarioForm").reset();
+          obtenerUsuarios();
+        } else {
+          alert("❌ Error al agregar usuario");
+        }
+      } catch (error) {
+        alert("❌ Error al conectarse al servidor");
+      }
+    });
+
+    async function eliminarUsuario(id) {
+      const confirmar = confirm("¿Estás segura de que deseas eliminar este usuario?");
+      if (!confirmar) return;
+
+      try {
+        const res = await fetch(`${apiURL}/${id}`, {
+          method: "DELETE"
+        });
+
+        if (res.ok) {
+          obtenerUsuarios();
+        } else {
+          alert("❌ No se pudo eliminar el usuario");
+        }
+      } catch (error) {
+        alert("❌ Error al conectarse al servidor");
+      }
+    }
+
+    obtenerUsuarios();
+  </script>
+</body>
+</html>
