@@ -25,7 +25,7 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 10
-          --health-start-period 20s
+          --health-start-period 30s
 
     steps:
       - name: 🔄 Checkout repositorio
@@ -34,6 +34,9 @@ jobs:
       - name: 📁 Navegar al backend e instalar dependencias
         working-directory: backend
         run: npm install
+
+      - name: ⏳ Esperar para asegurar SQL Server activo
+        run: sleep 40
 
       - name: 🧪 Ejecutar pruebas
         working-directory: backend
