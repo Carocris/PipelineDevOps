@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { poolConnect } = require('../db');
+const { getPool } = require('../db');
 
 // GET: Obtener todos los usuarios
 router.get('/', async (req, res) => {
   try {
-    const pool = await poolConnect;
+    const pool = getPool();
     const result = await pool.request().query('SELECT * FROM Usuarios');
     res.json(result.recordset);
   } catch (error) {
@@ -23,12 +23,12 @@ router.post('/', async (req, res) => {
   }
 
   try {
-    const pool = await poolConnect;
+    const pool = getPool();
     const result = await pool.request()
       .input('nombre', nombre)
       .input('email', email)
       .query('INSERT INTO Usuarios (nombre, email) OUTPUT INSERTED.* VALUES (@nombre, @email)');
-    
+
     res.status(201).json(result.recordset[0]);
   } catch (error) {
     console.error('❌ Error al agregar usuario:', error);
@@ -41,7 +41,7 @@ router.delete('/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
-    const pool = await poolConnect;
+    const pool = getPool();
     const result = await pool.request()
       .input('id', id)
       .query('DELETE FROM Usuarios WHERE id = @id');

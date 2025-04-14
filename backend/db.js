@@ -13,11 +13,11 @@ const config = {
   },
 };
 
-let pool; // variable global para la conexión
+let pool; // conexión global compartida
 
 async function initDatabase(retries = 5) {
   try {
-    // Conectar al master para crear la DB si no existe
+    // 1. Conexión a la base de datos 'master' para crear la principal si no existe
     const masterPool = await sql.connect({ ...config, database: 'master' });
     await masterPool.request().query(`
       IF DB_ID(N'${process.env.DB_NAME}') IS NULL
@@ -26,10 +26,10 @@ async function initDatabase(retries = 5) {
     await masterPool.close();
     console.log("✅ Base de datos verificada o creada");
 
-    // Conectarse a la base de datos
+    // 2. Conectar a la base de datos real
     pool = await sql.connect(config);
 
-    // Crear tabla Usuarios si no existe
+    // 3. Verificar y crear la tabla Usuarios
     await pool.request().query(`
       IF NOT EXISTS (
         SELECT * FROM sys.tables WHERE name = 'Usuarios'
@@ -41,6 +41,7 @@ async function initDatabase(retries = 5) {
       );
     `);
     console.log("✅ Tabla Usuarios verificada o creada correctamente");
+
   } catch (err) {
     if (retries > 0) {
       console.log(`⏳ Reintentando conexión... (${retries} restantes)`);
@@ -53,8 +54,14 @@ async function initDatabase(retries = 5) {
   }
 }
 
-// Exportar la función de inicialización y el pool una vez listo
+function getPool() {
+  if (!pool) {
+    throw new Error("❌ Conexión no inicializada. Llama a initDatabase() antes de usar getPool().");
+  }
+  return pool;
+}
+
 module.exports = {
   initDatabase,
-  getPool: () => pool,
+  getPool,
 };
