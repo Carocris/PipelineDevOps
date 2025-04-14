@@ -1,18 +1,5 @@
 # Entor# Ignorar dependencias
 node_modules/
-
-
-# Node
-node_modules/
-npm-debug.log
-yarn-debug.log
-yarn-error.log
-
-# Docker
+Dockerfile
 *.log
-docker-compose.override.yml
-
-# VSCode u otros editores
-.vscode/
-.DS_Store
-Thumbs.db
+.env

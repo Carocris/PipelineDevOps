@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: devops_backend
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DB_USER=sa
+      - DB_PASSWORD=UnaContraseñaFuerte123!
+      - DB_SERVER=devops_sqlserver
+      - DB_NAME=DevOpsDB
+    networks:
+      - devops_net
+    restart: on-failure
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: devops_sqlserver
+    environment:
+      SA_PASSWORD: "UnaContraseñaFuerte123!"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    restart: always
+    networks:
+      - devops_net
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P UnaContraseñaFuerte123! -Q 'SELECT 1' || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+      start_period: 50s
+
+networks:
+  devops_net:

@@ -156,25 +156,35 @@
     async function obtenerUsuarios() {
       try {
         const res = await fetch(apiURL);
-        const datos = await res.json();
+    
+        if (!res.ok) {
+          throw new Error("Respuesta no exitosa del backend");
+        }
+    
+        const datos = await res.json(); // <- Esto puede ser un arreglo vacío []
         const tabla = document.getElementById("usuariosTabla");
         tabla.innerHTML = "";
-
-        datos.forEach(usuario => {
-          const fila = `
-            <tr>
-              <td>${usuario.id}</td>
-              <td>${usuario.nombre}</td>
-              <td>${usuario.email}</td>
-              <td><button class="delete-btn" onclick="eliminarUsuario(${usuario.id})">🗑️</button></td>
-            </tr>`;
-          tabla.innerHTML += fila;
-        });
+    
+        if (datos.length === 0) {
+          tabla.innerHTML = `
+            <tr><td colspan="3" style="text-align:center; color: gray;">No hay usuarios registrados.</td></tr>
+          `;
+        } else {
+          datos.forEach(usuario => {
+            const fila = `
+              <tr>
+                <td>${usuario.id}</td>
+                <td>${usuario.nombre}</td>
+                <td>${usuario.email}</td>
+              </tr>`;
+            tabla.innerHTML += fila;
+          });
+        }
       } catch (error) {
-        //alert("❌ Error al obtener usuarios");
-        console.error(error);
+        alert("No se pudieron cargar los usuarios. Verifica la conexión.");
       }
     }
+    
 
     document.getElementById("usuarioForm").addEventListener("submit", async (e) => {
       e.preventDefault();
