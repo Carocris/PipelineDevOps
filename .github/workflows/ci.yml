@@ -19,12 +19,13 @@ jobs:
           SA_PASSWORD: "ccoa1234!"
           ACCEPT_EULA: "Y"
         ports:
-          - 3000:3000
+          - 1433:1433
         options: >-
-          --health-cmd "exit 0"
+          --health-cmd "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'ccoa1234!' -Q 'SELECT 1'"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 10
+          --health-start-period 20s
 
     steps:
       - name: 🔄 Checkout repositorio
@@ -34,21 +35,14 @@ jobs:
         working-directory: backend
         run: npm install
 
-      - name: 🧪 Ejecutar pruebas (si están disponibles)
+      - name: 🧪 Ejecutar pruebas
         working-directory: backend
-        run: |
-          if [ -f "package.json" ] && grep -q "\"test\":" package.json; then
-            npm test
-          else
-            echo "⚠️ No hay pruebas definidas en package.json"
-          fi
-
-      - name: 🌐 Simular conexión al backend (curl)
-        working-directory: backend
-        run: |
-          echo "Verificando si el servidor responde..."
-          echo "❌ Esto fallará si no hay servidor ejecutándose en el workflow"
-          curl --fail http://localhost:3000 || echo "⚠️ Backend no respondió. (Este paso es opcional)"
+        env:
+          DB_USER: sa
+          DB_PASSWORD: ccoa1234!
+          DB_SERVER: localhost
+          DB_NAME: DevOpsDB
+        run: npm test
 
       - name: 📦 Confirmar ejecución del pipeline
         run: echo "✅ CI ejecutado correctamente desde GitHub Actions"

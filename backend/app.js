@@ -21,7 +21,12 @@ app.get('/api', (req, res) => {
   res.send('🚀 Backend funcionando correctamente');
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
-});
+// 👉 Solo iniciar servidor si NO está siendo importado (como en los tests)
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app; // Exportar para pruebas con Jest
