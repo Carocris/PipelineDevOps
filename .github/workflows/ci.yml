@@ -15,13 +15,13 @@ jobs:
       mssql:
         image: mcr.microsoft.com/mssql/server:2022-latest
         env:
-          SA_PASSWORD: "CcoA_2024!"
+          SA_PASSWORD: "UnaContraseñaFuerte123!"
           ACCEPT_EULA: "Y"
         ports:
           - 1433:1433
         options: >-
           --memory 3g
-          --health-cmd "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'CcoA_2024!' -Q 'SELECT 1'"
+          --health-cmd "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'UnaContraseñaFuerte123!' -Q 'SELECT 1'"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 10
@@ -39,7 +39,7 @@ jobs:
         working-directory: backend
         env:
           DB_USER: sa
-          DB_PASSWORD: CcoA_2024!
+          DB_PASSWORD: UnaContraseñaFuerte123!
           DB_SERVER: localhost
           DB_NAME: DevOpsDB
         run: npm test
