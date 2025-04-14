@@ -40,12 +40,21 @@ jobs:
         run: |
           echo "DB_USER=sa" > .env.ci
           echo "DB_PASSWORD=UnaContraseñaFuerte123!" >> .env.ci
-          echo "DB_SERVER=mssql" >> .env.ci
+          echo "DB_SERVER=localhost" >> .env.ci
           echo "DB_NAME=DevOpsDB" >> .env.ci
           echo "PORT=3000" >> .env.ci
 
       - name: 💤 Esperar a que el contenedor de SQL esté listo
-        run: sleep 40
+        run: |
+          for i in {1..10}; do
+            /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "UnaContraseñaFuerte123!" -Q "SELECT 1"
+            if [ $? -eq 0 ]; then
+              echo "✅ SQL Server está listo"
+              break
+            fi
+            echo "⏳ Esperando a que SQL Server esté listo..."
+            sleep 5
+          done
 
       - name: 🧪 Ejecutar pruebas
         working-directory: backend

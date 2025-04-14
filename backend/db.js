@@ -5,7 +5,7 @@ const sql = require("mssql");
 const config = {
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  server: process.env.DB_SERVER,
+  server: process.env.DB_SERVER || 'localhost', // fallback a localhost si no está definido
   database: process.env.DB_NAME,
   options: {
     encrypt: false,
@@ -13,7 +13,7 @@ const config = {
   },
 };
 
-// Conexión al master para crear DB si no existe
+// Config para conectar al master y crear DB si no existe
 const masterConfig = { ...config, database: "master" };
 
 async function ensureDatabaseExists(retries = 5) {
@@ -30,7 +30,7 @@ async function ensureDatabaseExists(retries = 5) {
     if (retries > 0) {
       setTimeout(() => ensureDatabaseExists(retries - 1), 5000);
     } else {
-      console.error("❌ No se pudo conectar a SQL Server:", err);
+      console.error("❌ No se pudo conectar a SQL Server después de varios intentos:", err.message);
       process.exit(1);
     }
   }
@@ -53,11 +53,11 @@ poolConnect.then(async (pool) => {
     `);
     console.log("✅ Tabla Usuarios verificada o creada correctamente");
   } catch (error) {
-    console.error("❌ Error creando la tabla:", error);
+    console.error("❌ Error creando la tabla Usuarios:", error.message);
     process.exit(1);
   }
 }).catch((err) => {
-  console.error("❌ Error conectando a la base de datos:", err);
+  console.error("❌ Error conectando a la base de datos:", err.message);
   process.exit(1);
 });
 
