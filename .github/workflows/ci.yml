@@ -21,7 +21,7 @@ jobs:
           - 1433:1433
         options: >-
           --memory 3g
-          --health-cmd "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'UnaContraseñaFuerte123!' -Q 'SELECT 1'"
+          --health-cmd "bash -c '/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P \"UnaContraseñaFuerte123!\" -Q \"SELECT 1\" || exit 1'"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 10
@@ -40,8 +40,9 @@ jobs:
         env:
           DB_USER: sa
           DB_PASSWORD: UnaContraseñaFuerte123!
-          DB_SERVER: localhost
+          DB_SERVER: mssql
           DB_NAME: DevOpsDB
+          PORT: 3000
         run: npm test
 
       - name: ✅ Confirmar éxito
