@@ -1,4 +1,3 @@
-# .github/workflows/ci.yml
 name: 🚀 CI - Pipeline DevOps
 
 on:
@@ -16,12 +15,13 @@ jobs:
       mssql:
         image: mcr.microsoft.com/mssql/server:2022-latest
         env:
-          SA_PASSWORD: "ccoa1234!"
+          SA_PASSWORD: "CcoA_2024!"
           ACCEPT_EULA: "Y"
         ports:
           - 1433:1433
         options: >-
-          --health-cmd "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'ccoa1234!' -Q 'SELECT 1'"
+          --memory 3g
+          --health-cmd "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'CcoA_2024!' -Q 'SELECT 1'"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 10
@@ -39,10 +39,10 @@ jobs:
         working-directory: backend
         env:
           DB_USER: sa
-          DB_PASSWORD: ccoa1234!
+          DB_PASSWORD: CcoA_2024!
           DB_SERVER: localhost
           DB_NAME: DevOpsDB
         run: npm test
 
-      - name: 📦 Confirmar ejecución del pipeline
-        run: echo "✅ CI ejecutado correctamente desde GitHub Actions"
+      - name: ✅ Confirmar éxito
+        run: echo "🎉 Todo listo en el pipeline"
