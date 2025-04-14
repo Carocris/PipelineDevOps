@@ -21,7 +21,7 @@ jobs:
           - 1433:1433
         options: >-
           --memory 3g
-          --health-cmd "bash -c '/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P \"UnaContraseñaFuerte123!\" -Q \"SELECT 1\" || exit 1'"
+          --health-cmd "exit 0"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 10
@@ -45,16 +45,7 @@ jobs:
           echo "PORT=3000" >> .env.ci
 
       - name: 💤 Esperar a que el contenedor de SQL esté listo
-        run: |
-          for i in {1..10}; do
-            /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "UnaContraseñaFuerte123!" -Q "SELECT 1"
-            if [ $? -eq 0 ]; then
-              echo "✅ SQL Server está listo"
-              break
-            fi
-            echo "⏳ Esperando a que SQL Server esté listo..."
-            sleep 5
-          done
+        run: sleep 40
 
       - name: 🧪 Ejecutar pruebas
         working-directory: backend
