@@ -5,7 +5,7 @@ const sql = require("mssql");
 const config = {
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  server: process.env.DB_SERVER || 'localhost', // fallback a localhost si no está definido
+  server: process.env.DB_SERVER || 'localhost',
   database: process.env.DB_NAME,
   options: {
     encrypt: false,
@@ -13,34 +13,23 @@ const config = {
   },
 };
 
-// Config para conectar al master y crear DB si no existe
-const masterConfig = { ...config, database: "master" };
+let pool; // variable global para la conexión
 
-async function ensureDatabaseExists(retries = 5) {
+async function initDatabase(retries = 5) {
   try {
-    const pool = await sql.connect(masterConfig);
-    await pool.request().query(`
+    // Conectar al master para crear la DB si no existe
+    const masterPool = await sql.connect({ ...config, database: 'master' });
+    await masterPool.request().query(`
       IF DB_ID(N'${process.env.DB_NAME}') IS NULL
         CREATE DATABASE [${process.env.DB_NAME}];
     `);
-    await pool.close();
+    await masterPool.close();
     console.log("✅ Base de datos verificada o creada");
-  } catch (err) {
-    console.log(`⏳ Esperando conexión... reintentos restantes: ${retries}`);
-    if (retries > 0) {
-      setTimeout(() => ensureDatabaseExists(retries - 1), 5000);
-    } else {
-      console.error("❌ No se pudo conectar a SQL Server después de varios intentos:", err.message);
-      process.exit(1);
-    }
-  }
-}
 
-const pool = new sql.ConnectionPool(config);
-const poolConnect = ensureDatabaseExists().then(() => pool.connect());
+    // Conectarse a la base de datos
+    pool = await sql.connect(config);
 
-poolConnect.then(async (pool) => {
-  try {
+    // Crear tabla Usuarios si no existe
     await pool.request().query(`
       IF NOT EXISTS (
         SELECT * FROM sys.tables WHERE name = 'Usuarios'
@@ -52,13 +41,20 @@ poolConnect.then(async (pool) => {
       );
     `);
     console.log("✅ Tabla Usuarios verificada o creada correctamente");
-  } catch (error) {
-    console.error("❌ Error creando la tabla Usuarios:", error.message);
-    process.exit(1);
+  } catch (err) {
+    if (retries > 0) {
+      console.log(`⏳ Reintentando conexión... (${retries} restantes)`);
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      return initDatabase(retries - 1);
+    } else {
+      console.error("❌ Error crítico al inicializar la base de datos:", err.message);
+      process.exit(1);
+    }
   }
-}).catch((err) => {
-  console.error("❌ Error conectando a la base de datos:", err.message);
-  process.exit(1);
-});
+}
 
-module.exports = { pool, poolConnect };
+// Exportar la función de inicialización y el pool una vez listo
+module.exports = {
+  initDatabase,
+  getPool: () => pool,
+};

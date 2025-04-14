@@ -3,8 +3,10 @@ const cors = require('cors');
 const path = require('path');
 require('dotenv').config({ path: process.env.CI ? './.env.ci' : '../.env' });
 
-const app = express();
+const { initDatabase } = require('./db');
 const userRoutes = require('./routes/userRoutes');
+
+const app = express();
 
 // Middlewares
 app.use(cors());
@@ -24,8 +26,13 @@ app.get('/api', (req, res) => {
 // 👉 Solo iniciar servidor si NO está siendo importado (como en los tests)
 if (require.main === module) {
   const PORT = process.env.PORT || 3000;
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
+  initDatabase().then(() => {
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
+    });
+  }).catch((err) => {
+    console.error("❌ No se pudo iniciar el servidor:", err.message);
+    process.exit(1);
   });
 }
 
