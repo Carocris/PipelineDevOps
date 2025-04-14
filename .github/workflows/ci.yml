@@ -35,7 +35,7 @@ jobs:
         working-directory: backend
         run: npm install
 
-      - name: ⏳ Esperar para asegurar SQL Server activo
+      - name: 💤 Esperar a que el contenedor de SQL esté listo
         run: sleep 40
 
       - name: 🧪 Ejecutar pruebas
@@ -43,7 +43,7 @@ jobs:
         env:
           DB_USER: sa
           DB_PASSWORD: UnaContraseñaFuerte123!
-          DB_SERVER: mssql
+          DB_SERVER: mssql # 👈 nombre del servicio, no localhost
           DB_NAME: DevOpsDB
           PORT: 3000
         run: npm test
