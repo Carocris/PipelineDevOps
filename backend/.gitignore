@@ -1,5 +1,6 @@
 # Entornos y credenciales
 *.log
+.env.ci
 
 # Node
 node_modules/

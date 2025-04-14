@@ -1,3 +1,5 @@
+require('dotenv').config({ path: process.env.CI ? './.env.ci' : '../.env' });
+
 const sql = require("mssql");
 
 const config = {

@@ -35,17 +35,22 @@ jobs:
         working-directory: backend
         run: npm install
 
+      - name: 📄 Crear archivo .env.ci
+        working-directory: backend
+        run: |
+          echo "DB_USER=sa" > .env.ci
+          echo "DB_PASSWORD=UnaContraseñaFuerte123!" >> .env.ci
+          echo "DB_SERVER=mssql" >> .env.ci
+          echo "DB_NAME=DevOpsDB" >> .env.ci
+          echo "PORT=3000" >> .env.ci
+
       - name: 💤 Esperar a que el contenedor de SQL esté listo
         run: sleep 40
 
       - name: 🧪 Ejecutar pruebas
         working-directory: backend
         env:
-          DB_USER: sa
-          DB_PASSWORD: UnaContraseñaFuerte123!
-          DB_SERVER: mssql # 👈 nombre del servicio, no localhost
-          DB_NAME: DevOpsDB
-          PORT: 3000
+          CI: true
         run: npm test
 
       - name: ✅ Confirmar éxito
