@@ -1,3 +1,9 @@
+# 🚀 Proyecto DevOps - Pipeline de Backend
+
+Este proyecto forma parte de una práctica de DevOps en la que se desarrolla un backend básico con Node.js y Express, utilizando SQL Server como base de datos, todo orquestado con Docker y GitHub Actions como CI/CD.
+
+---
+
 👥 Integrantes del equipo
 
 Carolin Cristal Ortiz Alcántara – 2023-1333
@@ -6,12 +12,6 @@ Sander Rafael Fernández Tolentino – 2023-1001
 
 Bily Manuel Álvarez Sánchez – 2023-0952
 
-
-# 🚀 Proyecto DevOps - Pipeline de Backend
-
-Este proyecto forma parte de una práctica de DevOps en la que se desarrolla un backend básico con Node.js y Express, utilizando SQL Server como base de datos, todo orquestado con Docker y GitHub Actions como CI/CD.
-
----
 
 ## 📚 Tecnologías utilizadas
 
