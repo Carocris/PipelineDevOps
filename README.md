@@ -59,7 +59,7 @@ git clone https://github.com/Carocris/PipelineDevOps.git
 2. Crea un archivo `.env` en la raíz del proyecto:
 ```env
 DB_USER=sa
-DB_PASSWORD=ccoa1234!
+DB_PASSWORD=sa2002
 DB_SERVER=db
 DB_NAME=DevOpsDB
 ```
